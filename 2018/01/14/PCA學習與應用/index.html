@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="next-config" data-name="main" type="application/json">{&quot;hostname&quot;:&quot;mark1002.github.io&quot;,&quot;root&quot;:&quot;&#x2F;&quot;,&quot;images&quot;:&quot;&#x2F;images&quot;,&quot;scheme&quot;:&quot;Mist&quot;,&quot;version&quot;:&quot;8.4.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:false,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜尋...&quot;,&quot;empty&quot;:&quot;我們無法找到任何有關 ${query} 的搜索結果&quot;,&quot;hits_time&quot;:&quot;${hits} 找到 ${time} 個結果&quot;,&quot;hits&quot;:&quot;找到 ${hits} 個結果&quot;}}</script>
+<meta name="description" content="PCA 是一種特徵提取的技術，利用特徵降維來萃取出資料中最有代表性的主成分。而要注意的是 PCA 並不是從原本資料特徵中捨棄不重要的特徵來降維，而是由這些特徵與特徵向量 (eigenvector) 的線性組合所產生的新特徵來代表原本的資料。  X 表示一個 n x d 的資料集，n 是紀錄數，d 是資料維度也是特徵數，而 W 就是由 X 的共變異數矩陣所計算出來的特徵向量矩陣，d x k 維，其中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PCA學習與應用">
+<meta property="og:url" content="http://mark1002.github.io/2018/01/14/PCA%E5%AD%B8%E7%BF%92%E8%88%87%E6%87%89%E7%94%A8/index.html">
+<meta property="og:site_name" content="Mark&#39;s blog">
+<meta property="og:description" content="PCA 是一種特徵提取的技術，利用特徵降維來萃取出資料中最有代表性的主成分。而要注意的是 PCA 並不是從原本資料特徵中捨棄不重要的特徵來降維，而是由這些特徵與特徵向量 (eigenvector) 的線性組合所產生的新特徵來代表原本的資料。  X 表示一個 n x d 的資料集，n 是紀錄數，d 是資料維度也是特徵數，而 W 就是由 X 的共變異數矩陣所計算出來的特徵向量矩陣，d x k 維，其中">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/Ddhov6x.png">
+<meta property="og:image" content="https://i.imgur.com/hZH712X.png">
+<meta property="og:image" content="https://i.stack.imgur.com/1j5X1.png=100x100">
+<meta property="article:published_time" content="2018-01-14T07:46:35.000Z">
+<meta property="article:modified_time" content="2023-01-24T11:13:35.300Z">
+<meta property="article:author" content="Mark Chang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/Ddhov6x.png">
+
+
+<link rel="canonical" href="http://mark1002.github.io/2018/01/14/PCA%E5%AD%B8%E7%BF%92%E8%88%87%E6%87%89%E7%94%A8/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-TW&quot;,&quot;comments&quot;:true,&quot;permalink&quot;:&quot;http:&#x2F;&#x2F;mark1002.github.io&#x2F;2018&#x2F;01&#x2F;14&#x2F;PCA%E5%AD%B8%E7%BF%92%E8%88%87%E6%87%89%E7%94%A8&#x2F;&quot;,&quot;path&quot;:&quot;2018&#x2F;01&#x2F;14&#x2F;PCA學習與應用&#x2F;&quot;,&quot;title&quot;:&quot;PCA學習與應用&quot;}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">&quot;&quot;</script>
+<title>PCA學習與應用 | Mark's blog</title><script src="/js/config.js"></script>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Mark's blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>網站地圖</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#PCA-%E6%BC%94%E7%AE%97%E6%B3%95%E6%AD%A5%E9%A9%9F"><span class="nav-number">1.</span> <span class="nav-text">PCA 演算法步驟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PCA-%E7%95%B0%E5%B8%B8%E5%81%B5%E6%B8%AC"><span class="nav-number">2.</span> <span class="nav-text">PCA 異常偵測</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PCA-%E7%95%B0%E5%B8%B8%E5%81%B5%E6%B8%AC%E7%BC%BA%E9%BB%9E"><span class="nav-number">3.</span> <span class="nav-text">PCA 異常偵測缺點</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mark Chang"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Mark Chang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mark1002" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mark1002" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ak0922747401@gmail.com" title="E-Mail → mailto:ak0922747401@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/mark1002" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="http://mark1002.github.io/2018/01/14/PCA%E5%AD%B8%E7%BF%92%E8%88%87%E6%87%89%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Mark Chang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mark's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PCA學習與應用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2018-01-14 15:46:35" itemprop="dateCreated datePublished" datetime="2018-01-14T15:46:35+08:00">2018-01-14</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新於</span>
+        <time title="修改時間：2023-01-24 19:13:35" itemprop="dateModified" datetime="2023-01-24T19:13:35+08:00">2023-01-24</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/data-science/" itemprop="url" rel="index"><span itemprop="name">data science</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2018/01/14/PCA%E5%AD%B8%E7%BF%92%E8%88%87%E6%87%89%E7%94%A8/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/01/14/PCA學習與應用/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>PCA 是一種特徵提取的技術，利用特徵降維來萃取出資料中最有代表性的主成分。而要注意的是 PCA 並不是從原本資料特徵中捨棄不重要的特徵來降維，而是由這些特徵與特徵向量 (eigenvector) 的線性組合所產生的新特徵來代表原本的資料。</p>
+<p><img src="https://i.imgur.com/Ddhov6x.png"></p>
+<p>X 表示一個 <strong>n x d</strong> 的資料集，n 是紀錄數，d 是資料維度也是特徵數，而 W 就是由 X 的共變異數矩陣所計算出來的特徵向量矩陣，<strong>d x k</strong> 維，其中 1 &lt;= k &lt;= d ，k 就是指定的主成分數，即表示要留下來的特徵向量個數， <strong>X*W 就是 PCA 計算結果</strong>，矩陣的維度變為 <strong>(n x d)*(d x k)=n x k</strong> ，如此達到降維的效果。</p>
+<p><img src="https://i.imgur.com/hZH712X.png"></p>
+<h3 id="PCA-演算法步驟"><a href="#PCA-演算法步驟" class="headerlink" title="PCA 演算法步驟"></a>PCA 演算法步驟</h3><ol>
+<li>標準化 d 維原資料集</li>
+<li>建立共變異數矩陣(covariance matrix)</li>
+<li>分解共變異數矩陣(covariance matrix)為特徵向量(eigenvector)與特徵值(eigenvalues)。</li>
+<li>選取 k 個最大特徵值(eigenvalues)相對應k個的特徵向量(eigenvector)，其中 k 即為新特徵子空間的維數。</li>
+<li>使用排序最上面的 k 個的特徵向量(eigenvector)，建立投影矩陣(project matrix)W。</li>
+<li>使用投影矩陣(project matrix) W 轉換原本 d 維的原數據至新的 k 維特徵子空間。</li>
+</ol>
+<h3 id="PCA-異常偵測"><a href="#PCA-異常偵測" class="headerlink" title="PCA 異常偵測"></a>PCA 異常偵測</h3><p>PCA 本質上可以想成一個將資料去除雜質的方法，因此可以藉由比較資料去除雜質的差異，來找出這些雜質 (異常)。首先，可以簡單想成 PCA 是由一個原本矩陣 X 乘上投影矩陣 W 得到的結果。因此當然也就可以從 PCA 的結果乘上 W 的轉置矩陣來還原到原本的矩陣空間。因此得到以下公式:</p>
+<p>$$\underset{n\times k}{Z} = \underset{n\times d}{X} \times\underset{d\times k}{W}$$</p>
+<p>$$\underset{n\times d}{\bar{X}} = \underset{n\times k}{Z}\times\underset{k\times d}{W^\top}$$</p>
+<p>$\underset{n\times d}{\bar{X}}$ 就是從 PCA 空間還原的結果，而計算異常的方式就是計算 $\underset{n\times d}{\bar{X}}$ 與 $\underset{n\times d}{X}$ 兩者的歐式距離，即所謂的 <strong>reconstruction error</strong> ，如下圖所示新的測試資料點與經過 PCA 還原的點的距離就是該點的 reconstruction error，距離越大表示越有可能為異常。</p>
+<p><img src="https://i.stack.imgur.com/1j5X1.png=100x100"></p>
+<h3 id="PCA-異常偵測缺點"><a href="#PCA-異常偵測缺點" class="headerlink" title="PCA 異常偵測缺點"></a>PCA 異常偵測缺點</h3><ol>
+<li>不適合在資料量大的情況，拿全部的訓練資料來進行矩陣計算，資料量大時極耗運算資源。</li>
+<li>reconstruction error 必須要自行定義 threshold 值來判斷正常或是異常，無法自動得知。</li>
+</ol>
+<p>參考資料:<br><a target="_blank" rel="noopener" href="https://stats.stackexchange.com/questions/259806/anomaly-detection-using-pca-reconstruction-error">https://stats.stackexchange.com/questions/259806/anomaly-detection-using-pca-reconstruction-error</a><br><a target="_blank" rel="noopener" href="https://www.kaggle.com/ericlikedata/reconstruct-error-of-pca/data">https://www.kaggle.com/ericlikedata/reconstruct-error-of-pca/data</a><br><a target="_blank" rel="noopener" href="https://stats.stackexchange.com/questions/229092/how-to-reverse-pca-and-reconstruct-original-variables-from-several-principal-com">https://stats.stackexchange.com/questions/229092/how-to-reverse-pca-and-reconstruct-original-variables-from-several-principal-com</a><br><a target="_blank" rel="noopener" href="https://stats.stackexchange.com/questions/2691/making-sense-of-principal-component-analysis-eigenvectors-eigenvalues">https://stats.stackexchange.com/questions/2691/making-sense-of-principal-component-analysis-eigenvectors-eigenvalues</a><br><a target="_blank" rel="noopener" href="http://arbu00.blogspot.tw/2017/02/6-principal-component-analysispca.html">http://arbu00.blogspot.tw/2017/02/6-principal-component-analysispca.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>作者： </strong>Mark Chang
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="http://mark1002.github.io/2018/01/14/PCA%E5%AD%B8%E7%BF%92%E8%88%87%E6%87%89%E7%94%A8/" title="PCA學習與應用">http://mark1002.github.io/2018/01/14/PCA學習與應用/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/12/24/docker-%E6%8C%87%E4%BB%A4%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" rel="prev" title="docker 指令基本操作">
+                  <i class="fa fa-chevron-left"></i> docker 指令基本操作
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/02/10/Duck-typeing-in-python/" rel="next" title="Duck typeing in python">
+                  Duck typeing in python <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  <script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mark Chang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="disqus" type="application/json">{&quot;enable&quot;:true,&quot;shortname&quot;:&quot;mark1002&quot;,&quot;count&quot;:true,&quot;i18n&quot;:{&quot;disqus&quot;:&quot;disqus&quot;}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

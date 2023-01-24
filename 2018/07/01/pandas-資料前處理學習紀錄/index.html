@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="next-config" data-name="main" type="application/json">{&quot;hostname&quot;:&quot;mark1002.github.io&quot;,&quot;root&quot;:&quot;&#x2F;&quot;,&quot;images&quot;:&quot;&#x2F;images&quot;,&quot;scheme&quot;:&quot;Mist&quot;,&quot;version&quot;:&quot;8.4.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:false,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜尋...&quot;,&quot;empty&quot;:&quot;我們無法找到任何有關 ${query} 的搜索結果&quot;,&quot;hits_time&quot;:&quot;${hits} 找到 ${time} 個結果&quot;,&quot;hits&quot;:&quot;找到 ${hits} 個結果&quot;}}</script>
+<meta name="description" content="pandas 是 python 資料分析中資料前處理的神器，實務上在進行資料分析專案中往往 80% 時間都是在清理資料，剩下 20% 的時間才是在套用分析演算法，可見清理資料是如此重要的事情，本篇記錄我 pandas 的一些學習心得。 資料 NA 值統計利用以下程式技巧可以快速觀察資料中所有特徵的缺值記錄數。 12missing_values_count &#x3D; df.isnull().sum()mi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pandas 資料前處理學習紀錄">
+<meta property="og:url" content="http://mark1002.github.io/2018/07/01/pandas-%E8%B3%87%E6%96%99%E5%89%8D%E8%99%95%E7%90%86%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/index.html">
+<meta property="og:site_name" content="Mark&#39;s blog">
+<meta property="og:description" content="pandas 是 python 資料分析中資料前處理的神器，實務上在進行資料分析專案中往往 80% 時間都是在清理資料，剩下 20% 的時間才是在套用分析演算法，可見清理資料是如此重要的事情，本篇記錄我 pandas 的一些學習心得。 資料 NA 值統計利用以下程式技巧可以快速觀察資料中所有特徵的缺值記錄數。 12missing_values_count &#x3D; df.isnull().sum()mi">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/ymONgjh.png">
+<meta property="og:image" content="https://i.imgur.com/bgshTCM.png">
+<meta property="og:image" content="https://i.imgur.com/9UYkjqV.png">
+<meta property="article:published_time" content="2018-07-01T08:42:36.000Z">
+<meta property="article:modified_time" content="2023-01-24T11:13:35.301Z">
+<meta property="article:author" content="Mark Chang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/ymONgjh.png">
+
+
+<link rel="canonical" href="http://mark1002.github.io/2018/07/01/pandas-%E8%B3%87%E6%96%99%E5%89%8D%E8%99%95%E7%90%86%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-TW&quot;,&quot;comments&quot;:true,&quot;permalink&quot;:&quot;http:&#x2F;&#x2F;mark1002.github.io&#x2F;2018&#x2F;07&#x2F;01&#x2F;pandas-%E8%B3%87%E6%96%99%E5%89%8D%E8%99%95%E7%90%86%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84&#x2F;&quot;,&quot;path&quot;:&quot;2018&#x2F;07&#x2F;01&#x2F;pandas-資料前處理學習紀錄&#x2F;&quot;,&quot;title&quot;:&quot;pandas 資料前處理學習紀錄&quot;}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">&quot;&quot;</script>
+<title>pandas 資料前處理學習紀錄 | Mark's blog</title><script src="/js/config.js"></script>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Mark's blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>網站地圖</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B3%87%E6%96%99-NA-%E5%80%BC%E7%B5%B1%E8%A8%88"><span class="nav-number">1.</span> <span class="nav-text">資料 NA 值統計</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%BB%E9%99%A4-NA-%E5%80%BC"><span class="nav-number">2.</span> <span class="nav-text">去除 NA 值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E8%87%AA%E5%8B%95%E5%A1%AB%E8%A3%9C-NA-%E5%80%BC%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">資料自動填補 NA 值的操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%82%E9%96%93%E5%BA%8F%E5%88%97%E8%A7%A3%E6%9E%90%E5%BA%A6%E6%93%8D%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">時間序列解析度操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E5%88%86%E5%89%B2%E9%81%B8%E6%93%87%E8%88%87%E5%90%88%E4%BD%B5"><span class="nav-number">5.</span> <span class="nav-text">資料分割選擇與合併</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mark Chang"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Mark Chang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mark1002" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mark1002" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ak0922747401@gmail.com" title="E-Mail → mailto:ak0922747401@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/mark1002" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="http://mark1002.github.io/2018/07/01/pandas-%E8%B3%87%E6%96%99%E5%89%8D%E8%99%95%E7%90%86%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Mark Chang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mark's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          pandas 資料前處理學習紀錄
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2018-07-01 16:42:36" itemprop="dateCreated datePublished" datetime="2018-07-01T16:42:36+08:00">2018-07-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新於</span>
+        <time title="修改時間：2023-01-24 19:13:35" itemprop="dateModified" datetime="2023-01-24T19:13:35+08:00">2023-01-24</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/data-science/" itemprop="url" rel="index"><span itemprop="name">data science</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2018/07/01/pandas-%E8%B3%87%E6%96%99%E5%89%8D%E8%99%95%E7%90%86%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/07/01/pandas-資料前處理學習紀錄/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>pandas 是 python 資料分析中資料前處理的神器，實務上在進行資料分析專案中往往 80% 時間都是在清理資料，剩下 20% 的時間才是在套用分析演算法，可見清理資料是如此重要的事情，本篇記錄我 pandas 的一些學習心得。</p>
+<h3 id="資料-NA-值統計"><a href="#資料-NA-值統計" class="headerlink" title="資料 NA 值統計"></a>資料 NA 值統計</h3><p>利用以下程式技巧可以快速觀察資料中所有特徵的缺值記錄數。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">missing_values_count = df.isnull().<span class="built_in">sum</span>()</span><br><span class="line">missing_values_count[:<span class="number">10</span>]</span><br></pre></td></tr></table></figure>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Date</span>                <span class="number">0</span></span><br><span class="line"><span class="attribute">GameID</span>              <span class="number">0</span></span><br><span class="line"><span class="attribute">Drive</span>               <span class="number">0</span></span><br><span class="line"><span class="attribute">qtr</span>                 <span class="number">0</span></span><br><span class="line"><span class="attribute">down</span>            <span class="number">61154</span></span><br><span class="line"><span class="attribute">time</span>              <span class="number">224</span></span><br><span class="line"><span class="attribute">TimeUnder</span>           <span class="number">0</span></span><br><span class="line"><span class="attribute">TimeSecs</span>          <span class="number">224</span></span><br><span class="line"><span class="attribute">PlayTimeDiff</span>      <span class="number">444</span></span><br><span class="line"><span class="attribute">SideofField</span>       <span class="number">528</span></span><br><span class="line"><span class="attribute">dtype</span>: int<span class="number">64</span></span><br></pre></td></tr></table></figure>
+<h3 id="去除-NA-值"><a href="#去除-NA-值" class="headerlink" title="去除 NA 值"></a>去除 NA 值</h3><p>此方法預設會以一列一列 (row) 的方式 <code>axis=0</code> 由上往下去除含有 NA 值的該筆記錄。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.dropna()</span><br></pre></td></tr></table></figure>
+<p>指定參數 <code>axis=1</code> 的話則去除 NA 值的方向會變成以一行一行 (column) 的方式由左至右去除掉含有 NA 的欄位。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.dropna(axis=<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="資料自動填補-NA-值的操作"><a href="#資料自動填補-NA-值的操作" class="headerlink" title="資料自動填補 NA 值的操作"></a>資料自動填補 NA 值的操作</h3><p>此方法會自動將資料中的 NA 值替換成 0。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.fillna(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<p>也可以選擇其他補值的方法，例如採用以一列列的方式由後面的有值記錄補向前面缺值的記錄。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subset_df.fillna(method = <span class="string">&#x27;bfill&#x27;</span>, axis=<span class="number">0</span>).fillna(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="時間序列解析度操作"><a href="#時間序列解析度操作" class="headerlink" title="時間序列解析度操作"></a>時間序列解析度操作</h3><p>時間序列解析也是 pandas 的強項，像是我常用的時間序列 <code>resample</code> 功能，可以很方便的變換記錄的間隔單位。</p>
+<p>例如有如下的 df 資料</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">                   <span class="attribute">a</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">18</span> -<span class="number">0</span>.<span class="number">159224</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">19</span>  <span class="number">0</span>.<span class="number">836197</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">20</span>  <span class="number">0</span>.<span class="number">168442</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">21</span>  <span class="number">0</span>.<span class="number">147137</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">22</span> -<span class="number">0</span>.<span class="number">605849</span></span><br></pre></td></tr></table></figure>
+<p>可以輸入以下程式碼來將時間間隔放大，從一天變兩天。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.resample(<span class="string">&#x27;2D&#x27;</span>).asfreq()</span><br></pre></td></tr></table></figure>
+<p>可以發現間隔變為兩天，同時資料量減少。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">                   <span class="attribute">a</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">18</span> -<span class="number">0</span>.<span class="number">159224</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">20</span>  <span class="number">0</span>.<span class="number">168442</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">22</span> -<span class="number">0</span>.<span class="number">605849</span></span><br></pre></td></tr></table></figure>
+<p>同樣的道理間隔變小，則產生的記錄會變多了，如以下改成每 12 小時一個區間如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.resample(<span class="string">&#x27;12H&#x27;</span>).asfreq()</span><br></pre></td></tr></table></figure>
+<p><code>asfreq</code> 只會單純的把時間序列拉長，不對資料數值做修改，因此新產生紀錄值會保持空的。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">                            <span class="attribute">a</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">18</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> -<span class="number">0</span>.<span class="number">159224</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">18</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span>       NaN</span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">19</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>  <span class="number">0</span>.<span class="number">836197</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">19</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span>       NaN</span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">20</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>  <span class="number">0</span>.<span class="number">168442</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">20</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span>       NaN</span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">21</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>  <span class="number">0</span>.<span class="number">147137</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">21</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span>       NaN</span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> -<span class="number">0</span>.<span class="number">605849</span></span><br></pre></td></tr></table></figure>
+<p>若不想產生 NA 值可以改用其他函式來產生重新 resample 後的時間序列資料。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.resample(<span class="string">&#x27;12H&#x27;</span>).bfill()</span><br></pre></td></tr></table></figure>
+<p>如此資料就可以由後往前來填補了。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">                            <span class="attribute">a</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">18</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> -<span class="number">0</span>.<span class="number">159224</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">18</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span>  <span class="number">0</span>.<span class="number">836197</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">19</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>  <span class="number">0</span>.<span class="number">836197</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">19</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span>  <span class="number">0</span>.<span class="number">168442</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">20</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>  <span class="number">0</span>.<span class="number">168442</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">20</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span>  <span class="number">0</span>.<span class="number">147137</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">21</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>  <span class="number">0</span>.<span class="number">147137</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">21</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span> -<span class="number">0</span>.<span class="number">605849</span></span><br><span class="line"><span class="attribute">2018</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> -<span class="number">0</span>.<span class="number">605849</span></span><br></pre></td></tr></table></figure>
+<h3 id="資料分割選擇與合併"><a href="#資料分割選擇與合併" class="headerlink" title="資料分割選擇與合併"></a>資料分割選擇與合併</h3><p>資料的分割與選擇 pandas 主要可使用以下兩種方法:</p>
+<p><strong>iloc</strong><br>iloc 是以 position-based index 的資料選擇方法，以數字來做為行與列的選擇。<br><strong>loc</strong><br>loc 則是以 label-based index 的方式選擇，將 index 以字串匹配的方式來選擇第幾行與第幾列。</p>
+<p>如下參考圖所示:<br><img src="https://i.imgur.com/ymONgjh.png"><br>首先令測試的 df 如下所示，維度為 4 x 4 的資料。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">	        <span class="attribute">a</span>	       b	       c	       d</span><br><span class="line"><span class="attribute">0</span>	-<span class="number">0</span>.<span class="number">400363</span>	<span class="number">1</span>.<span class="number">141485</span>	<span class="number">0</span>.<span class="number">821102</span>	<span class="number">0</span>.<span class="number">237137</span></span><br><span class="line"><span class="attribute">1</span>	-<span class="number">0</span>.<span class="number">122230</span>	<span class="number">0</span>.<span class="number">293221</span>	-<span class="number">1</span>.<span class="number">318223</span>	<span class="number">0</span>.<span class="number">765636</span></span><br><span class="line"><span class="attribute">2</span>	<span class="number">1</span>.<span class="number">530837</span>	-<span class="number">0</span>.<span class="number">730529</span>	-<span class="number">0</span>.<span class="number">614539</span>	-<span class="number">0</span>.<span class="number">639149</span></span><br><span class="line"><span class="attribute">3</span>	-<span class="number">0</span>.<span class="number">201329</span>	<span class="number">1</span>.<span class="number">279875</span>	<span class="number">1</span>.<span class="number">875210</span>	<span class="number">0</span>.<span class="number">466313</span></span><br></pre></td></tr></table></figure>
+<p>使用 iloc 選擇資料範圍到前 2 列，欄位第 1, 3 欄程式碼如下，可以發現 iloc 的 position 如同一般的陣列一樣 index 從 0 開始。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.iloc[:<span class="number">2</span>,[<span class="number">0</span>,<span class="number">2</span>]]</span><br></pre></td></tr></table></figure>
+<p>以下成功的選取到指定的資料。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">               <span class="attribute">a</span>	       c</span><br><span class="line"><span class="attribute">0</span>	 <span class="number">1</span>.<span class="number">574904</span>     -<span class="number">0</span>.<span class="number">263963</span></span><br><span class="line"><span class="attribute">1</span>	-<span class="number">1</span>.<span class="number">377969</span>	<span class="number">2</span>.<span class="number">188388</span></span><br></pre></td></tr></table></figure>
+<p>改用 loc 時，要以 label 的思維來進行資料的選取，以下是選用與 iloc 同樣行列範圍的程式寫法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.loc[:<span class="number">1</span>,[<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;c&#x27;</span>]]</span><br></pre></td></tr></table></figure>
+<p>結果如下，亦可以成功的選取到與上例一樣的資料，但要注意的事當 df 的 index 是數值表示時 (如同本例的 df index: [0,1,2,3])，<strong>loc 一樣會把看似數值表示的 index 以 label 字串匹配的角度來進行資料選取</strong>。這也是為什麼 loc 的 row number range 是 1，而 iloc 卻是到 2，因為 loc 把 1 當成是字串 label 來選取了。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">               <span class="attribute">a</span>	       c</span><br><span class="line"><span class="attribute">0</span>	 <span class="number">1</span>.<span class="number">574904</span>     -<span class="number">0</span>.<span class="number">263963</span></span><br><span class="line"><span class="attribute">1</span>	-<span class="number">1</span>.<span class="number">377969</span>	<span class="number">2</span>.<span class="number">188388</span></span><br></pre></td></tr></table></figure>
+<p><strong>合併 concat</strong><br>合併也是 pandas 常見的任務，利用合併更多的資料欄位來進行分析來取得更好的結果。以下來紀錄 pandas 中 <code>concat</code> 涵式的用法。<br>定義以下的兩個 df，為度分別為 <code>4 X 5</code>以及<code>6 X 4</code>來進行合併操作。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">df1 = pd.DataFrame(np.random.randn(<span class="number">4</span>,<span class="number">5</span>), columns=[<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;c&#x27;</span>, <span class="string">&#x27;d&#x27;</span>, <span class="string">&#x27;e&#x27;</span>])</span><br><span class="line">df2 = pd.DataFrame(np.random.randn(<span class="number">6</span>,<span class="number">4</span>), columns=[<span class="string">&#x27;g&#x27;</span>, <span class="string">&#x27;y&#x27;</span>, <span class="string">&#x27;k&#x27;</span>, <span class="string">&#x27;f&#x27;</span>])</span><br><span class="line"><span class="built_in">print</span>(df1.shape)</span><br><span class="line"><span class="built_in">print</span>(df2.shape)</span><br></pre></td></tr></table></figure>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">(<span class="number">6</span>, <span class="number">4</span>)</span><br></pre></td></tr></table></figure>
+<p>首先是列方向的合併，看到參數 <code>axis=0</code> 就可以立馬連想到是列的方向。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列方向合併 (上下)</span></span><br><span class="line">merge_df = pd.concat([df1, df2], axis=<span class="number">0</span>)</span><br><span class="line">merge_df</span><br></pre></td></tr></table></figure>
+<p>程式執行如以下所示，可以發現兩個 df 確實的上下合併了，而且若沒有共同的欄位則會在新的 df 中全部補上並設為 NA 值。<br><img src="https://i.imgur.com/bgshTCM.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(merge_df.shape)</span><br></pre></td></tr></table></figure>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">10</span>, <span class="number">9</span>)</span><br></pre></td></tr></table></figure>
+<p>最後行的合併方法如下，設 <code>axis=0</code> 來左右方向合併。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 行方向合併 (左右)</span></span><br><span class="line">merge_df = pd.concat([df1, df2], axis=<span class="number">1</span>)</span><br><span class="line">merge_df</span><br></pre></td></tr></table></figure>
+<p>可以發現兩個 df 也確實的左右合併了，而且合併後的 df 的長度會以原先被合併中最長的 df 為主，產生的空缺部分也一樣自動設為 NA 值。<img src="https://i.imgur.com/9UYkjqV.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">merge_df.shape</span><br></pre></td></tr></table></figure>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">6</span>, <span class="number">9</span>)</span><br></pre></td></tr></table></figure>
+<p>最後附上我 github 上面的 <a target="_blank" rel="noopener" href="https://github.com/Mark1002/pandas-exercise">pandas 程式練習參考</a>。</p>
+<p>reference<br><a target="_blank" rel="noopener" href="https://www.kaggle.com/rtatman/data-cleaning-challenge-handling-missing-values">https://www.kaggle.com/rtatman/data-cleaning-challenge-handling-missing-values</a><br><a target="_blank" rel="noopener" href="http://www.learningthemachine.com/2017/08/20/review-pandas-loc-vs-iloc/">http://www.learningthemachine.com/2017/08/20/review-pandas-loc-vs-iloc/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>作者： </strong>Mark Chang
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="http://mark1002.github.io/2018/07/01/pandas-%E8%B3%87%E6%96%99%E5%89%8D%E8%99%95%E7%90%86%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/" title="pandas 資料前處理學習紀錄">http://mark1002.github.io/2018/07/01/pandas-資料前處理學習紀錄/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/06/24/InfluxDB-%E5%AD%B8%E7%BF%92%E8%A8%98%E9%8C%84/" rel="prev" title="InfluxDB 學習記錄">
+                  <i class="fa fa-chevron-left"></i> InfluxDB 學習記錄
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/07/31/python-%E5%AF%A6%E7%8F%BE-singleton-%E6%A8%A1%E5%BC%8F/" rel="next" title="python 實現 singleton 模式">
+                  python 實現 singleton 模式 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  <script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mark Chang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="disqus" type="application/json">{&quot;enable&quot;:true,&quot;shortname&quot;:&quot;mark1002&quot;,&quot;count&quot;:true,&quot;i18n&quot;:{&quot;disqus&quot;:&quot;disqus&quot;}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

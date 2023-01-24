@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="next-config" data-name="main" type="application/json">{&quot;hostname&quot;:&quot;mark1002.github.io&quot;,&quot;root&quot;:&quot;&#x2F;&quot;,&quot;images&quot;:&quot;&#x2F;images&quot;,&quot;scheme&quot;:&quot;Mist&quot;,&quot;version&quot;:&quot;8.4.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:false,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜尋...&quot;,&quot;empty&quot;:&quot;我們無法找到任何有關 ${query} 的搜索結果&quot;,&quot;hits_time&quot;:&quot;${hits} 找到 ${time} 個結果&quot;,&quot;hits&quot;:&quot;找到 ${hits} 個結果&quot;}}</script>
+<meta name="description" content="常說深度學習有三大網路，分別是 DNN、 CNN 與 RNN。DNN 就是一般類神經網路的多層網路，廣泛的應用在一般資料的機器學習任務。CNN 則是擁有捲積層的特化類神經網路，捲積層的特性使得這類網路在圖像辨識的應用上表現非常突出，一般有關圖像的任務大多使用 CNN 處理，至於 RNN 就是所謂的遞歸神經網路，擁有對過去歷史記錄記憶的能力，可以找出不同時間點記錄的行為模式，因此常應用於序列資料模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LSTM 類神經網路學習紀錄">
+<meta property="og:url" content="http://mark1002.github.io/2018/04/04/LSTM-%E9%A1%9E%E7%A5%9E%E7%B6%93%E7%B6%B2%E8%B7%AF%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/index.html">
+<meta property="og:site_name" content="Mark&#39;s blog">
+<meta property="og:description" content="常說深度學習有三大網路，分別是 DNN、 CNN 與 RNN。DNN 就是一般類神經網路的多層網路，廣泛的應用在一般資料的機器學習任務。CNN 則是擁有捲積層的特化類神經網路，捲積層的特性使得這類網路在圖像辨識的應用上表現非常突出，一般有關圖像的任務大多使用 CNN 處理，至於 RNN 就是所謂的遞歸神經網路，擁有對過去歷史記錄記憶的能力，可以找出不同時間點記錄的行為模式，因此常應用於序列資料模式">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/SgeVmDJ.png">
+<meta property="og:image" content="https://i.imgur.com/SrvjOKq.png">
+<meta property="article:published_time" content="2018-04-04T05:09:57.000Z">
+<meta property="article:modified_time" content="2023-01-24T11:13:35.300Z">
+<meta property="article:author" content="Mark Chang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/SgeVmDJ.png">
+
+
+<link rel="canonical" href="http://mark1002.github.io/2018/04/04/LSTM-%E9%A1%9E%E7%A5%9E%E7%B6%93%E7%B6%B2%E8%B7%AF%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-TW&quot;,&quot;comments&quot;:true,&quot;permalink&quot;:&quot;http:&#x2F;&#x2F;mark1002.github.io&#x2F;2018&#x2F;04&#x2F;04&#x2F;LSTM-%E9%A1%9E%E7%A5%9E%E7%B6%93%E7%B6%B2%E8%B7%AF%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84&#x2F;&quot;,&quot;path&quot;:&quot;2018&#x2F;04&#x2F;04&#x2F;LSTM-類神經網路學習紀錄&#x2F;&quot;,&quot;title&quot;:&quot;LSTM 類神經網路學習紀錄&quot;}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">&quot;&quot;</script>
+<title>LSTM 類神經網路學習紀錄 | Mark's blog</title><script src="/js/config.js"></script>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Mark's blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>網站地圖</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mark Chang"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Mark Chang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mark1002" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mark1002" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ak0922747401@gmail.com" title="E-Mail → mailto:ak0922747401@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/mark1002" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="http://mark1002.github.io/2018/04/04/LSTM-%E9%A1%9E%E7%A5%9E%E7%B6%93%E7%B6%B2%E8%B7%AF%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Mark Chang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mark's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LSTM 類神經網路學習紀錄
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2018-04-04 13:09:57" itemprop="dateCreated datePublished" datetime="2018-04-04T13:09:57+08:00">2018-04-04</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新於</span>
+        <time title="修改時間：2023-01-24 19:13:35" itemprop="dateModified" datetime="2023-01-24T19:13:35+08:00">2023-01-24</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/deep-learning/" itemprop="url" rel="index"><span itemprop="name">deep learning</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2018/04/04/LSTM-%E9%A1%9E%E7%A5%9E%E7%B6%93%E7%B6%B2%E8%B7%AF%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/04/04/LSTM-類神經網路學習紀錄/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>常說深度學習有三大網路，分別是 DNN、 CNN 與 RNN。DNN 就是一般類神經網路的多層網路，廣泛的應用在一般資料的機器學習任務。CNN 則是擁有捲積層的特化類神經網路，捲積層的特性使得這類網路在圖像辨識的應用上表現非常突出，一般有關圖像的任務大多使用 CNN 處理，至於 RNN 就是所謂的遞歸神經網路，擁有對過去歷史記錄記憶的能力，可以找出不同時間點記錄的行為模式，因此常應用於序列資料模式學習等相關任務，像是時間序列預測，語言翻譯等等。</p>
+<p>而 LSTM 是其中一種 RNN ，由於其改進了傳統 RNN 的缺點，因此現在一般來說 LSTM 算是最常使用的 RNN 了，以下記錄我使用 kreas 實作 LSTM 的學習記錄：<br>資料我使用網路上參考的 sine-wave 資料，5001 筆記錄與 1 個特徵維度，視覺化資料為下圖所示：<br><img src="https://i.imgur.com/SgeVmDJ.png"><br>要做的是對 sine-wave 預測資料走勢的任務，而要給 LSTM 的 input 資料必須要經過轉換才可做後續的訓練，參考 <a target="_blank" rel="noopener" href="https://keras.io/layers/recurrent/">keras 的官方文檔</a>可以得知 recurrent layers 接受的 input shape 為 <code>(batch_size, timesteps, input_dim)</code>，<code>batch_size</code> 表示每次 LSTM 收到多少筆序列資料來執行梯度下降的序列資料筆數，換句話說 LSTM 基本的數入單位就是一筆序列記錄，<code>timesteps</code> 就是指該筆序列記錄從時間點 t 往回看多少單位時間點的長度，像是 <code>timesteps=3</code> 表示往回看了 t-2, t-1, t 共三筆記錄，而 <code>input_dim</code> 就是這個序列記錄的維度數，即有多少特徵，像是本資料的例子只有 1 個特徵，因此 <code>input_dim =1</code>。</p>
+<p>而要如何將原本的資料轉換成序列資料的形式呢？這裡的例子很簡單，概念就是去做 time slice window 轉換。如以下的程式碼所示設定<code>window_size = 50</code>將原本維度為 (5001, 1) 資料轉換乘 (4951, 51) 維度，這裡的 51 就是 timesteps 數，50 多了 1 是要做為預測目標變數 y 之用。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">window_size = <span class="number">50</span></span><br><span class="line">series_s = series.copy()</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(window_size):</span><br><span class="line">    series = pd.concat([series, series_s.shift(-(i+<span class="number">1</span>))], axis = <span class="number">1</span>)</span><br><span class="line">series.dropna(axis=<span class="number">0</span>, inplace=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+<p>之後將轉換後的資料切分 train 與 test 資料：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">nrow = <span class="built_in">round</span>(<span class="number">0.8</span>*series.shape[<span class="number">0</span>])</span><br><span class="line">train = series.iloc[:nrow, :]</span><br><span class="line">test = series.iloc[nrow:,:]</span><br><span class="line"></span><br><span class="line">train_X = (train.iloc[:,:-<span class="number">1</span>]).values</span><br><span class="line">train_y = (train.iloc[:,-<span class="number">1</span>]).values</span><br><span class="line">test_X = (test.iloc[:,:-<span class="number">1</span>]).values</span><br><span class="line">test_y = (test.iloc[:,-<span class="number">1</span>]).values</span><br><span class="line"></span><br><span class="line"><span class="comment"># reshape to (batch_size, timesteps, input_dim)</span></span><br><span class="line">train_X = train_X.reshape(train_X.shape[<span class="number">0</span>],train_X.shape[<span class="number">1</span>],<span class="number">1</span>)</span><br><span class="line">test_X = test_X.reshape(test_X.shape[<span class="number">0</span>],test_X.shape[<span class="number">1</span>],<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>接下來就是建立 model 的部分了，這裡建立了一個很簡單的 LSTM 模型，新版 keras 2.0 的 recurrent layers API 已可以不限制 input timesteps 的長度，所以 <code>input_shape=(None,1)</code>，而 batch size 這裏則是在 fit 資料時設定。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Define the LSTM model</span></span><br><span class="line">model = Sequential()</span><br><span class="line">model.add(LSTM(<span class="number">10</span>, input_shape=(<span class="literal">None</span>,<span class="number">1</span>)))</span><br><span class="line">model.add(Dense(<span class="number">1</span>))</span><br><span class="line">model.<span class="built_in">compile</span>(loss=<span class="string">&quot;mse&quot;</span>, optimizer=<span class="string">&quot;adam&quot;</span>)</span><br><span class="line">model.summary()</span><br></pre></td></tr></table></figure>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="code">-----------------------------------------------------------------</span></span><br><span class="line"><span class="code">Layer (type)                 Output Shape              Param #   </span></span><br><span class="line"><span class="code">=================================================================</span></span><br><span class="line"><span class="code">lstm_47 (LSTM)               (None, 10)                480       </span></span><br><span class="line"><span class="code">-----------------------------------------------------------------</span></span><br><span class="line"><span class="section">dense_33 (Dense)             (None, 1)                 11        </span></span><br><span class="line"><span class="section">=================================================================</span></span><br><span class="line">Total params: 491</span><br><span class="line">Trainable params: 491</span><br><span class="line">Non-trainable params: 0</span><br></pre></td></tr></table></figure>
+<p>經過一番參數調整後，最後模型的預測結果挺不錯的，連 mse 都小到趨近於 0 無法顯示而溢位了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">model.fit(train_X, train_y, batch_size=<span class="number">128</span>, epochs=<span class="number">20</span>, validation_split=<span class="number">0.1</span>)</span><br><span class="line">preds = model.predict(test_X)</span><br><span class="line">actuals = test_y</span><br><span class="line">mean_squared_error(actuals,preds)</span><br></pre></td></tr></table></figure>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">6</span>.<span class="number">0673873664723943</span>e-<span class="number">06</span></span><br></pre></td></tr></table></figure>
+<p>視覺化出來預測結果與實際測試資料的預測變數 Y 分佈可以發現幾乎一模一樣重疊在一起了，證明了這個 LSTM 模型學習成功。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pyplot.plot(actuals)</span><br><span class="line">pyplot.plot(preds)</span><br><span class="line">pyplot.show()</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/SrvjOKq.png"></p>
+<p>reference:<br><a target="_blank" rel="noopener" href="https://machinelearningmastery.com/timedistributed-layer-for-long-short-term-memory-networks-in-python/">https://machinelearningmastery.com/timedistributed-layer-for-long-short-term-memory-networks-in-python/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>作者： </strong>Mark Chang
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="http://mark1002.github.io/2018/04/04/LSTM-%E9%A1%9E%E7%A5%9E%E7%B6%93%E7%B6%B2%E8%B7%AF%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/" title="LSTM 類神經網路學習紀錄">http://mark1002.github.io/2018/04/04/LSTM-類神經網路學習紀錄/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/04/04/python-%E7%B9%BC%E6%89%BF%E6%A9%9F%E5%88%B6%E7%A0%94%E7%A9%B6/" rel="prev" title="python 繼承機制研究">
+                  <i class="fa fa-chevron-left"></i> python 繼承機制研究
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/04/07/python-%E7%88%AC%E8%9F%B2%E5%AD%B8%E7%BF%92%E8%A8%98%E9%8C%84/" rel="next" title="python 爬蟲學習記錄">
+                  python 爬蟲學習記錄 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  <script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mark Chang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="disqus" type="application/json">{&quot;enable&quot;:true,&quot;shortname&quot;:&quot;mark1002&quot;,&quot;count&quot;:true,&quot;i18n&quot;:{&quot;disqus&quot;:&quot;disqus&quot;}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

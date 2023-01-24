@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="next-config" data-name="main" type="application/json">{&quot;hostname&quot;:&quot;mark1002.github.io&quot;,&quot;root&quot;:&quot;&#x2F;&quot;,&quot;images&quot;:&quot;&#x2F;images&quot;,&quot;scheme&quot;:&quot;Mist&quot;,&quot;version&quot;:&quot;8.4.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:false,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜尋...&quot;,&quot;empty&quot;:&quot;我們無法找到任何有關 ${query} 的搜索結果&quot;,&quot;hits_time&quot;:&quot;${hits} 找到 ${time} 個結果&quot;,&quot;hits&quot;:&quot;找到 ${hits} 個結果&quot;}}</script>
+<meta name="description" content="最近想複習基本的資料結構，首先第一個想到還給老師就是 heap 了。所以就從 heap 開始。這次實作的是 max heap，定義如下圖所示，max heap 為一個完整二元樹 (complete binary tree)，且每個父節點皆大於等於其左右子節點，由於完整二元樹的性質， max heap 資料結構可以很方便的使用陣列來表示。  假設陣列 index i 從 1 開始，heap 用陣列來">
+<meta property="og:type" content="article">
+<meta property="og:title" content="複習 max heap">
+<meta property="og:url" content="http://mark1002.github.io/2020/04/26/%E8%A4%87%E7%BF%92-max-heap/index.html">
+<meta property="og:site_name" content="Mark&#39;s blog">
+<meta property="og:description" content="最近想複習基本的資料結構，首先第一個想到還給老師就是 heap 了。所以就從 heap 開始。這次實作的是 max heap，定義如下圖所示，max heap 為一個完整二元樹 (complete binary tree)，且每個父節點皆大於等於其左右子節點，由於完整二元樹的性質， max heap 資料結構可以很方便的使用陣列來表示。  假設陣列 index i 從 1 開始，heap 用陣列來">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/ma2BP4J.png">
+<meta property="og:image" content="https://i.imgur.com/e8zlyr7.png">
+<meta property="article:published_time" content="2020-04-26T06:48:11.000Z">
+<meta property="article:modified_time" content="2023-01-24T11:13:35.301Z">
+<meta property="article:author" content="Mark Chang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/ma2BP4J.png">
+
+
+<link rel="canonical" href="http://mark1002.github.io/2020/04/26/%E8%A4%87%E7%BF%92-max-heap/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-TW&quot;,&quot;comments&quot;:true,&quot;permalink&quot;:&quot;http:&#x2F;&#x2F;mark1002.github.io&#x2F;2020&#x2F;04&#x2F;26&#x2F;%E8%A4%87%E7%BF%92-max-heap&#x2F;&quot;,&quot;path&quot;:&quot;2020&#x2F;04&#x2F;26&#x2F;複習-max-heap&#x2F;&quot;,&quot;title&quot;:&quot;複習 max heap&quot;}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">&quot;&quot;</script>
+<title>複習 max heap | Mark's blog</title><script src="/js/config.js"></script>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Mark's blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>網站地圖</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Mark Chang"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Mark Chang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mark1002" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mark1002" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ak0922747401@gmail.com" title="E-Mail → mailto:ak0922747401@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/mark1002" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="http://mark1002.github.io/2020/04/26/%E8%A4%87%E7%BF%92-max-heap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Mark Chang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mark's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          複習 max heap
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2020-04-26 14:48:11" itemprop="dateCreated datePublished" datetime="2020-04-26T14:48:11+08:00">2020-04-26</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新於</span>
+        <time title="修改時間：2023-01-24 19:13:35" itemprop="dateModified" datetime="2023-01-24T19:13:35+08:00">2023-01-24</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/data-structure/" itemprop="url" rel="index"><span itemprop="name">data structure</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/26/%E8%A4%87%E7%BF%92-max-heap/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/26/複習-max-heap/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>最近想複習基本的資料結構，首先第一個想到還給老師就是 <code>heap</code> 了。所以就從 <code>heap</code> 開始。<br>這次實作的是 <code>max heap</code>，定義如下圖所示，<code>max heap</code> 為一個完整二元樹 (<a target="_blank" rel="noopener" href="https://web.cecs.pdx.edu/~sheard/course/Cs163/Doc/FullvsComplete.html">complete binary tree</a>)，且每個父節點皆大於等於其左右子節點，由於完整二元樹的性質， <code>max heap</code> 資料結構可以很方便的使用陣列來表示。</p>
+<p><img src="https://i.imgur.com/ma2BP4J.png"></p>
+<p>假設陣列 index <code>i</code> 從 1 開始，<code>heap</code> 用陣列來表示又可以延伸出以下節點間的性質：<br><img src="https://i.imgur.com/e8zlyr7.png"></p>
+<p>有了以上的節點性質，就可以很方便的應用在以下的實作。首先介紹<code>max heap</code>裡面最重要的部分 <code>max heapify</code>，給定一個元素的 index，由 top-down 的方式遞迴檢查該節點及其左右子節點有無符合 <code>max heap</code> 定義，若無則調整之。程式碼如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">max_heapify</span>(<span class="params">a, i, heap_size</span>):</span></span><br><span class="line">    left_i = <span class="number">2</span> * i + <span class="number">1</span></span><br><span class="line">    right_i = <span class="number">2</span> * i + <span class="number">2</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> left_i &lt; heap_size <span class="keyword">and</span> a[i] &lt; a[left_i]:</span><br><span class="line">        biggest = left_i</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        biggest = i</span><br><span class="line">    <span class="keyword">if</span> right_i &lt; heap_size <span class="keyword">and</span> a[biggest] &lt; a[right_i]:</span><br><span class="line">        biggest = right_i</span><br><span class="line">    <span class="keyword">if</span> biggest != i:</span><br><span class="line">        a[biggest], a[i] = a[i], a[biggest]</span><br><span class="line">        max_heapify(a, biggest, heap_size)</span><br></pre></td></tr></table></figure>
+<p>而 <code>max heapify</code> 設計上是針對該點以及左右子結點，依深度優先搜尋路徑調整成 <code>max heap</code>，如果 <code>max heapify</code> 的起始是根節點，依序要將整顆樹都調整成<code>max heap</code>，是會有其盲點的，因為這樣不會考慮整體的樹皆為 <code>max heap</code>，所以<code>max heapify</code>的起始點要從最小的父節點開始，以 bottom up 的方式由小到大來調整才可以確保整棵樹都符合<code>max heap</code>性質，程式碼如下所示。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># build max-heap</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_max_heap</span>(<span class="params">a, heap_size</span>):</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(a)//<span class="number">2</span>-<span class="number">1</span>, -<span class="number">1</span>, -<span class="number">1</span>):</span><br><span class="line">        max_heapify(a, i, heap_size)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&#x27;max heap: <span class="subst">&#123;a&#125;</span>&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p><code>len(a)//2-1</code> 表示從最後位置的父節點開始往前做 <code>max heapify</code>。最後介紹 <code>max heap</code> 應用，由小到大排列的 <code>heap sort</code>，程式碼如下。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># heap sort</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">heap_sort</span>(<span class="params">a</span>):</span></span><br><span class="line">    heap_size = <span class="built_in">len</span>(a)</span><br><span class="line">    build_max_heap(a, heap_size)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(a)-<span class="number">1</span>, <span class="number">0</span>, -<span class="number">1</span>):</span><br><span class="line">        a[<span class="number">0</span>], a[i] = a[i], a[<span class="number">0</span>]</span><br><span class="line">        heap_size -= <span class="number">1</span></span><br><span class="line">        max_heapify(a, <span class="number">0</span>, heap_size)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&#x27;heap sort: <span class="subst">&#123;a&#125;</span>&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>原理為將 <code>max heap tree</code> 中的最大根節點與最後節點交換，接著縮小 heap size 範圍，呼叫 <code>max heapify</code> 調整，再繼續重複以上步驟直到所有陣列元素都調整過結束。<br>ref:</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://web.stanford.edu/class/archive/cs/cs161/cs161.1168/lecture4.pdf">https://web.stanford.edu/class/archive/cs/cs161/cs161.1168/lecture4.pdf</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>作者： </strong>Mark Chang
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="http://mark1002.github.io/2020/04/26/%E8%A4%87%E7%BF%92-max-heap/" title="複習 max heap">http://mark1002.github.io/2020/04/26/複習-max-heap/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/01/05/HAproxy-docker-swarm-%E9%83%A8%E7%BD%B2%E8%A8%98%E9%8C%84/" rel="prev" title="HAproxy docker swarm 部署記錄">
+                  <i class="fa fa-chevron-left"></i> HAproxy docker swarm 部署記錄
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/10/03/%E8%A7%A3%E6%B1%BA-docker-%E5%9F%B7%E8%A1%8C-crontab-%E7%92%B0%E5%A2%83%E8%AE%8A%E6%95%B8%E9%81%BA%E5%A4%B1%E5%95%8F%E9%A1%8C/" rel="next" title="解決 docker 執行 crontab 環境變數遺失問題">
+                  解決 docker 執行 crontab 環境變數遺失問題 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  <script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mark Chang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="disqus" type="application/json">{&quot;enable&quot;:true,&quot;shortname&quot;:&quot;mark1002&quot;,&quot;count&quot;:true,&quot;i18n&quot;:{&quot;disqus&quot;:&quot;disqus&quot;}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>
