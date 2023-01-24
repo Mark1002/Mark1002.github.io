@@ -134,14 +134,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
   </nav>
@@ -266,18 +266,18 @@
  <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$docker build -t imagename:<span class="keyword">tag</span> <span class="title">.</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li>build 指令參數 <code>-t</code> 用來指定新建立 image 的名稱與 tag。</li>
-<li>後面這個點 <code>.</code>表示 Dockerfile 所在的當前目錄，也表示要給 docker daemon build 的 context 路徑，只有在這個路徑之下檔案才會被正確的複製給 docker daemon 來製作 </li>
+<li>後面這個點 <code>.</code>表示 Dockerfile 所在的當前目錄，也表示要給 docker daemon build 的 context 路徑，只有在這個路徑之下檔案才會被正確的複製給 docker daemon 來製作</li>
 </ul>
 </li>
 <li><p>執行 docker image，這個指令會產生一個 container 來運行該 image</p>
- <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$docker</span> <span class="builtin-name">run</span> --rm -it -p 8000:8000 imagename:tag</span><br></pre></td></tr></table></figure>
+ <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$docker</span> <span class="built_in">run</span> --rm -it -p 8000:8000 imagename:tag</span><br></pre></td></tr></table></figure>
 <ul>
 <li><code>-it</code>表示顯示出 terminal 的交互環境。</li>
 <li><code>-p &lt;server port&gt;:&lt;container port&gt;</code> run 指令的數值參數，把主機的通訊埠所有流量轉發到 container 的通訊埠。</li>
 </ul>
 </li>
 <li><p>將 image 發佈到 dockerhub 中。</p>
- <figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$docker</span> login -u <span class="variable">&lt;username&gt;</span> -p <span class="variable">&lt;password&gt;</span></span><br><span class="line"><span class="variable">$docker</span> <span class="keyword">tag</span> imagename:<span class="keyword">tag</span> namespace/imagename</span><br><span class="line"><span class="variable">$docker</span> push namespace/imagename</span><br></pre></td></tr></table></figure>
+ <figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$docker login -u &lt;username&gt; -p &lt;password&gt;</span><br><span class="line">$docker tag imagename:tag <span class="keyword">namespace</span>/<span class="symbol">imagename</span></span><br><span class="line">$<span class="symbol">docker</span> <span class="symbol">push</span> <span class="symbol">namespace</span>/<span class="symbol">imagename</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li>首先需要登入個人的 dockerhub 帳號，接著用 <code>tag</code> 指令來指定要用哪個 local image 來 push 到 dockerhub 上，<code>namespace</code> 就是對應的個人帳號。</li>
 <li>接著在執行 <code>push</code> 指令就可以發佈了。</li>

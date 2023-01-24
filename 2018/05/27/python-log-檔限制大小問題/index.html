@@ -136,14 +136,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
   </nav>
@@ -268,7 +268,7 @@
 <p>logging 負責寫入 log 檔的 handler 是由 <code>RotatingFileHandler</code> 這個類別來處理的。這個類別會將記錄存到 log 檔中，若裏頭存放的紀錄即將超過 <code>maxBytes</code> 的設定範圍時，則會備份舊的記錄到備份檔中，並且依照 <code>backupCount</code> 給定的數目來依序產生備份檔。像是有個 log 檔 <code>app.log</code>，若 <code>backupCount=3</code> 則將會依序產生 <code>app.log.1</code>, <code>app.log.2</code>, <code>app.log.3</code> 等備份檔，若這些備份都滿了，則會回到 <code>app.log</code> 從頭開始將新的記錄蓋過舊的記錄，所以故名思義真得跟 rotating ㄧ樣。</p>
 <p><img src="https://i.imgur.com/4yoYmNe.png"></p>
 <p>經過一方折騰終於發現問題出在哪了。以下是取自<a target="_blank" rel="noopener" href="https://docs.python.org/3/library/logging.handlers.html#logging.handlers.RotatingFileHandler">官方文件說明</a>：<br><em>Rollover occurs whenever the current log file is nearly maxBytes in length; <strong>but if either of maxBytes or backupCount is zero, rollover never occurs</strong>, so you generally want to set backupCount to at least 1, and have a non-zero maxBytes.</em><br>原因就是我沒有指定 <code>backupCount</code>， 而這個參數預設就是 0，沒有備份檔根本就不能將舊的記錄寫入，所以很自然的 log 檔就會越長越大了。<br>所以非常重要的一點是必須要加上 <code>backupCount</code> 這個參數，且值至少為 1，<code>RotatingFileHandler</code> 才可以根據 <code>maxBytes</code> 設定來將舊紀錄寫入備份檔。<br>再來值得注意的是，如果 log 是寫在 django 的話，則 django develop server 所對應的執行指令必須要加上 <code>--noreload</code> 參數，<code>RotatingFileHandler</code> 的設定才會有用，原因是 django 再 develop server 模式下會有兩個 thread，一個是執行 django 服務的主體，另一個則是監聽程式碼有沒有被修改，有修改則 reload 服務。所以若不把 reload 服務的 thread 關掉，則 log 檔就會被這個 thread 占住了，無法讓 <code>RotatingFileHandler</code> 對 log 檔進行大小限制處理，詳細指令如以下所示:</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">python</span> manage.<span class="keyword">py</span> runserver --noreload</span><br></pre></td></tr></table></figure>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage<span class="selector-class">.py</span> runserver <span class="attr">--noreload</span></span><br></pre></td></tr></table></figure>
 <p>所以我在 16 行加上了 <code>backupCount </code> 並指定為 1，如此就可以解決 django 中 log 檔無限制增加的問題了。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;file&#x27;</span>: </span><br><span class="line">    &#123; </span><br><span class="line">        <span class="string">&#x27;level&#x27;</span>: <span class="string">&#x27;INFO&#x27;</span>, </span><br><span class="line">        <span class="string">&#x27;class&#x27;</span>:<span class="string">&#x27;logging.handlers.RotatingFileHandler&#x27;</span>, </span><br><span class="line">        <span class="string">&#x27;filename&#x27;</span>: <span class="string">&#x27;log/debug.log&#x27;</span>, </span><br><span class="line">        <span class="string">&#x27;maxBytes&#x27;</span>: <span class="number">5</span>*<span class="number">1024</span>*<span class="number">1024</span>,</span><br><span class="line">        <span class="string">&#x27;backupCount&#x27;</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="string">&#x27;formatter&#x27;</span>: <span class="string">&#x27;standard&#x27;</span>, </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 

@@ -139,14 +139,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
   </nav>
@@ -267,7 +267,7 @@
     <div class="post-body" itemprop="articleBody">
         <p>PCA 是一種特徵提取的技術，利用特徵降維來萃取出資料中最有代表性的主成分。而要注意的是 PCA 並不是從原本資料特徵中捨棄不重要的特徵來降維，而是由這些特徵與特徵向量 (eigenvector) 的線性組合所產生的新特徵來代表原本的資料。</p>
 <p><img src="https://i.imgur.com/Ddhov6x.png"></p>
-<p>X 表示一個 <strong>n x d</strong> 的資料集，n 是紀錄數，d 是資料維度也是特徵數，而 W 就是由 X 的共變異數矩陣所計算出來的特徵向量矩陣，<strong>d x k</strong> 維，其中 1 &lt;= k &lt;= d ，k 就是指定的主成分數，即表示要留下來的特徵向量個數， <strong>X*W 就是 PCA 計算結果</strong>，矩陣的維度變為 <strong>(n x d)*(d x k)=n x k</strong> ，如此達到降維的效果。</p>
+<p>X 表示一個 <strong>n x d</strong> 的資料集，n 是紀錄數，d 是資料維度也是特徵數，而 W 就是由 X 的共變異數矩陣所計算出來的特徵向量矩陣，<strong>d x k</strong> 維，其中 1 &lt;&#x3D; k &lt;&#x3D; d ，k 就是指定的主成分數，即表示要留下來的特徵向量個數， <strong>X*W 就是 PCA 計算結果</strong>，矩陣的維度變為 <strong>(n x d)*(d x k)&#x3D;n x k</strong> ，如此達到降維的效果。</p>
 <p><img src="https://i.imgur.com/hZH712X.png"></p>
 <h3 id="PCA-演算法步驟"><a href="#PCA-演算法步驟" class="headerlink" title="PCA 演算法步驟"></a>PCA 演算法步驟</h3><ol>
 <li>標準化 d 維原資料集</li>
@@ -278,8 +278,8 @@
 <li>使用投影矩陣(project matrix) W 轉換原本 d 維的原數據至新的 k 維特徵子空間。</li>
 </ol>
 <h3 id="PCA-異常偵測"><a href="#PCA-異常偵測" class="headerlink" title="PCA 異常偵測"></a>PCA 異常偵測</h3><p>PCA 本質上可以想成一個將資料去除雜質的方法，因此可以藉由比較資料去除雜質的差異，來找出這些雜質 (異常)。首先，可以簡單想成 PCA 是由一個原本矩陣 X 乘上投影矩陣 W 得到的結果。因此當然也就可以從 PCA 的結果乘上 W 的轉置矩陣來還原到原本的矩陣空間。因此得到以下公式:</p>
-<p>$$\underset{n\times k}{Z} = \underset{n\times d}{X} \times\underset{d\times k}{W}$$</p>
-<p>$$\underset{n\times d}{\bar{X}} = \underset{n\times k}{Z}\times\underset{k\times d}{W^\top}$$</p>
+<p>$$\underset{n\times k}{Z} &#x3D; \underset{n\times d}{X} \times\underset{d\times k}{W}$$</p>
+<p>$$\underset{n\times d}{\bar{X}} &#x3D; \underset{n\times k}{Z}\times\underset{k\times d}{W^\top}$$</p>
 <p>$\underset{n\times d}{\bar{X}}$ 就是從 PCA 空間還原的結果，而計算異常的方式就是計算 $\underset{n\times d}{\bar{X}}$ 與 $\underset{n\times d}{X}$ 兩者的歐式距離，即所謂的 <strong>reconstruction error</strong> ，如下圖所示新的測試資料點與經過 PCA 還原的點的距離就是該點的 reconstruction error，距離越大表示越有可能為異常。</p>
 <p><img src="https://i.stack.imgur.com/1j5X1.png=100x100"></p>
 <h3 id="PCA-異常偵測缺點"><a href="#PCA-異常偵測缺點" class="headerlink" title="PCA 異常偵測缺點"></a>PCA 異常偵測缺點</h3><ol>

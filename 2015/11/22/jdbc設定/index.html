@@ -20,12 +20,12 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
 
 <script class="next-config" data-name="main" type="application/json">{&quot;hostname&quot;:&quot;mark1002.github.io&quot;,&quot;root&quot;:&quot;&#x2F;&quot;,&quot;images&quot;:&quot;&#x2F;images&quot;,&quot;scheme&quot;:&quot;Mist&quot;,&quot;version&quot;:&quot;8.4.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:false,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜尋...&quot;,&quot;empty&quot;:&quot;我們無法找到任何有關 ${query} 的搜索結果&quot;,&quot;hits_time&quot;:&quot;${hits} 找到 ${time} 個結果&quot;,&quot;hits&quot;:&quot;找到 ${hits} 個結果&quot;}}</script>
-<meta name="description" content="今天在設定jsp專案所遇到的問題，Eclipse一直遇到抓不到jdbc的mysql driver。上網花了一些時間查查原來是jsp要使用到jdbc driver，是要在 WEB-INF&#x2F;lib裡面把driver的jar檔放入而不是傳統的在java Resource資料夾裡設定java library路徑。如以下圖所示：   參考資料http:&#x2F;&#x2F;stackoverflow.com&#x2F;question">
+<meta name="description" content="今天在設定jsp專案所遇到的問題，Eclipse一直遇到抓不到jdbc的mysql driver。上網花了一些時間查查原來是jsp要使用到jdbc driver，是要在 WEB-INF&#x2F;lib裡面把driver的jar檔放入而不是傳統的在java Resource資料夾裡設定java library路徑。如以下圖所示：   參考資料http:&#x2F;&#x2F;stackoverflow.com&#x2F;que">
 <meta property="og:type" content="article">
 <meta property="og:title" content="jdbc設定">
 <meta property="og:url" content="http://mark1002.github.io/2015/11/22/jdbc%E8%A8%AD%E5%AE%9A/index.html">
 <meta property="og:site_name" content="Mark&#39;s blog">
-<meta property="og:description" content="今天在設定jsp專案所遇到的問題，Eclipse一直遇到抓不到jdbc的mysql driver。上網花了一些時間查查原來是jsp要使用到jdbc driver，是要在 WEB-INF&#x2F;lib裡面把driver的jar檔放入而不是傳統的在java Resource資料夾裡設定java library路徑。如以下圖所示：   參考資料http:&#x2F;&#x2F;stackoverflow.com&#x2F;question">
+<meta property="og:description" content="今天在設定jsp專案所遇到的問題，Eclipse一直遇到抓不到jdbc的mysql driver。上網花了一些時間查查原來是jsp要使用到jdbc driver，是要在 WEB-INF&#x2F;lib裡面把driver的jar檔放入而不是傳統的在java Resource資料夾裡設定java library路徑。如以下圖所示：   參考資料http:&#x2F;&#x2F;stackoverflow.com&#x2F;que">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="http://mark1002.github.io/2015/11/22/jdbc%E8%A8%AD%E5%AE%9A/jdbc-path.png">
 <meta property="article:published_time" content="2015-11-22T15:04:47.000Z">
@@ -136,14 +136,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
   </nav>
@@ -262,7 +262,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>今天在設定jsp專案所遇到的問題，Eclipse一直遇到抓不到jdbc的mysql driver。上網花了一些時間查查原來是jsp要使用到jdbc driver，是要在 WEB-INF/lib裡面把driver的jar檔放入而不是傳統的在java Resource資料夾裡設定java library路徑。<br>如以下圖所示：</p>
+        <p>今天在設定jsp專案所遇到的問題，Eclipse一直遇到抓不到jdbc的mysql driver。上網花了一些時間查查原來是jsp要使用到jdbc driver，是要在 WEB-INF&#x2F;lib裡面把driver的jar檔放入而不是傳統的在java Resource資料夾裡設定java library路徑。<br>如以下圖所示：</p>
 <img src="/2015/11/22/jdbc%E8%A8%AD%E5%AE%9A/jdbc-path.png" class="" title="jdbc路徑位置">
 
 <p>參考資料<br><a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/17701610/cannot-find-or-load-oracle-jdbc-driver-oracledriver">http://stackoverflow.com/questions/17701610/cannot-find-or-load-oracle-jdbc-driver-oracledriver</a></p>
@@ -296,9 +296,6 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2014/11/08/g0v/" rel="prev" title="g0v年會感想">
-                  <i class="fa fa-chevron-left"></i> g0v年會感想
-                </a>
             </div>
             <div class="post-nav-item">
                 <a href="/2016/01/29/javascript%E5%8E%9F%E5%9E%8B%E9%8F%88%E7%B9%BC%E6%89%BF/" rel="next" title="javascript原型鏈繼承">

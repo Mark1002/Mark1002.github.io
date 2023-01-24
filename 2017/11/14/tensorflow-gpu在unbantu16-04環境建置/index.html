@@ -134,14 +134,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
   </nav>
@@ -266,13 +266,13 @@
 <figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service lightdm stop</span><br></pre></td></tr></table></figure>
 <p>根據<a target="_blank" rel="noopener" href="http://city.shaform.com/blog/2016/10/31/install-tensorflow-with-cuda.html">這篇</a>的說法這條指令的作用是用來達到顯示卡與內顯區別的目的，如果不打這條指令就裝 cuda 的話，重新開機後 unbantu 會畫面全黑或是卡在系統 loading 畫面。<br>(ps:本人就是這樣才重新裝第二次!)</p>
 <p>之後就可以開始安裝 cuda 了，輸入以下安裝指令來安裝。這裡有一點要注意的是要指定 <code>cuda=version</code> 來安裝，不指定的話預設裝上的是 cuda9</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo dpkg --install cuda-repo-ubantu1604_8.0.61-1_amd64.deb</span><br><span class="line">$ sudo apt-<span class="builtin-name">get</span> update</span><br><span class="line">$ sudo apt-<span class="builtin-name">get</span> install <span class="attribute">cuda</span>=8.0.61-1</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo dpkg --install cuda-repo-ubantu1604_8.0.61-1_amd64.deb</span><br><span class="line">$ sudo apt-<span class="built_in">get</span> update</span><br><span class="line">$ sudo apt-<span class="built_in">get</span> install <span class="attribute">cuda</span>=8.0.61-1</span><br></pre></td></tr></table></figure>
 <p>裝完後到 <code>.bashrc</code> 貼上以下環境變數路徑，之後記得先重開機看看能不能順利入系統</p>
-<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export PATH=<span class="variable">$PATH</span><span class="symbol">:/usr/local/cuda-</span><span class="number">8.0</span>/bin</span><br><span class="line">export LD_LIBRARY_PATH=<span class="regexp">/usr/local</span><span class="regexp">/cuda-8.0/lib</span>64</span><br></pre></td></tr></table></figure>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export <span class="variable constant_">PATH</span>=<span class="variable">$PATH</span><span class="symbol">:/usr/local/cuda-</span><span class="number">8.0</span>/bin</span><br><span class="line">export <span class="variable constant_">LD_LIBRARY_PATH</span>=<span class="regexp">/usr/local</span><span class="regexp">/cuda-8.0/lib</span>64</span><br></pre></td></tr></table></figure>
 <p>接著開始來安裝 cudnn，輸入以下指令</p>
 <figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ tar -xvzf cudnn-<span class="number">8.0</span>-linux-x64-v6.<span class="number">0</span>.tgz</span><br><span class="line">$ sudo cp cuda<span class="regexp">/include/</span>cudnn.h <span class="regexp">/usr/</span>local<span class="regexp">/cuda/i</span>nclude</span><br><span class="line">$ sudo cp cuda<span class="regexp">/lib64/</span>libcudnn* <span class="regexp">/usr/</span>local<span class="regexp">/cuda/</span>lib64</span><br><span class="line">$ sudo chmod a+r <span class="regexp">/usr/</span>local<span class="regexp">/cuda/i</span>nclude<span class="regexp">/cudnn.h /u</span>sr<span class="regexp">/local/</span>cuda<span class="regexp">/lib64/</span>libcudnn*</span><br></pre></td></tr></table></figure>
 <p>以上都裝好的話可以打以下指令來 check 顯卡是否有裝好</p>
-<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>nvidia-smi</span><br></pre></td></tr></table></figure>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>nvidia-smi</span><br></pre></td></tr></table></figure>
 
 <p>之後就是裝 tensorflow 了，基本上都跟<a target="_blank" rel="noopener" href="https://www.tensorflow.org/install/install_linux">官網</a>一樣，沒什麼不同。<br>本人採用的是 Anaconda 的安裝環境，創一個虛擬的環境後打以下指令</p>
 <figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pip install https:<span class="regexp">//</span>storage.googleapis.com<span class="regexp">/tensorflow/</span>linux<span class="regexp">/gpu/</span>tensorflow_gpu-<span class="number">1.3</span>.<span class="number">0</span>-cp35-cp35m-linux_x86_64.whl</span><br></pre></td></tr></table></figure>

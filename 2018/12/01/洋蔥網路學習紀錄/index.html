@@ -136,14 +136,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
   </nav>
@@ -267,11 +267,11 @@
 <p><img src="https://i.imgur.com/eNKAFDd.png"></p>
 <p>而 TOR 這種複雜的隨機多重代理特性，使得其難以追蹤使用者真實的來源IP，因此成為暗網活動最好的平台。python 也剛好有支援發送 TOR 請求的套件，以下為一個簡單的 tor 請求存取程式建立步驟。</p>
 <p>首先，參考<a target="_blank" rel="noopener" href="https://gist.github.com/DusanMadar/8d11026b7ce0bce6a67f7dd87b999f6b">此篇</a>安裝範例安裝 TOR 相關套件及設定，這裡我使用 docker Ubuntu 的 container 作為安裝環境，首先安裝  TOR。</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="builtin-name">get</span> update</span><br><span class="line">sudo apt-<span class="builtin-name">get</span> install tor</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="built_in">get</span> update</span><br><span class="line">sudo apt-<span class="built_in">get</span> install tor</span><br></pre></td></tr></table></figure>
 <p>安裝完成後接著就可以試著啟動 TOR 服務了。</p>
 <figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">service tor start </span><br><span class="line"><span class="bullet">* </span>Starting tor daemon...          [ OK ] </span><br></pre></td></tr></table></figure>
 <p>接著可以進一步的去設定 TOR，這裏利用<code>--hash-password</code>設定了一組密碼以防本機被其他外部代理所存取，輸出為得到了一個 hash 碼。</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">tor</span> --hash-password &lt;enter your password here&gt;</span><br><span class="line"><span class="attribute">16</span>:ED<span class="number">2893</span>D<span class="number">8</span>EC<span class="number">97801</span>C<span class="number">60</span>DF<span class="number">4</span>A<span class="number">72249</span>CBCCD<span class="number">8</span>B<span class="number">97</span>B<span class="number">3</span>B<span class="number">01</span>A<span class="number">15</span>C<span class="number">923</span>DC<span class="number">49</span>A<span class="number">0</span>E<span class="number">500</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tor <span class="comment">--hash-password &lt;enter your password here&gt;</span></span><br><span class="line"><span class="number">16</span>:ED2893D8EC97801C60DF4A72249CBCCD8B97B3B01A15C923DC49A0E500</span><br></pre></td></tr></table></figure>
 <p>接著到設定檔所在位置 <code>/etc/tor/torrc</code> 設定密碼以及 <code>ControlPort</code>。</p>
 <figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ControlPort <span class="number">9051</span></span><br><span class="line">HashedControlPassword &lt;your hashed passsword obtained earlier here&gt;</span><br><span class="line">CookieAuthentication <span class="number">1</span></span><br><span class="line"></span><br><span class="line">### This section is just for location-hidden services ###</span><br></pre></td></tr></table></figure>
 <p>最後重啟服務來完成設定。</p>
